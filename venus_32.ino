@@ -1,4 +1,3 @@
-// Dependencies
 #include <Arduino.h>
 #include <Adafruit_NeoPixel.h>
 #include <ESPAsyncWebServer.h>
@@ -49,8 +48,8 @@ int hexVal = 16516088;
 int fogCycle = 1;
 
 unsigned long previousMillis2 = 0;  // will store last time LED was updated
-unsigned long OffTime = 180000;      // defualt fog cycle
-unsigned long OnTime = 8000;
+unsigned long OffTime = 3000;      // defualt fog cycle
+unsigned long OnTime = 10000;
 
 
 const char *wifi_network_ssid = "Induct Technologies";
@@ -279,19 +278,19 @@ void startPodAnimation(int wait) {
   }
 
   // Rainbow animation
-  rainbowCyycle(5); // Adjust the delay as needed
+ // rainbowCyycle(5); // Adjust the delay as needed
 }
 
-void rainbowCyycle(int wait) {
-  int j;
-  for (j = 0; j < 256 * 5; j++) { // 5 cycles of all colors on wheel
-    for (int i = 0; i < pixels.numPixels(); i++) {
-      pixels.setPixelColor(i, Wheel(((i * 256 / pixels.numPixels()) + j) & 255));
-    }
-    pixels.show();
-    delay(wait);
-  }
-}
+// void rainbowCyycle(int wait) {
+//   int j;
+//   for (j = 0; j < 256 * 5; j++) { // 5 cycles of all colors on wheel
+//     for (int i = 0; i < pixels.numPixels(); i++) {
+//       pixels.setPixelColor(i, Wheel(((i * 256 / pixels.numPixels()) + j) & 255));
+//     }
+//     pixels.show();
+//     delay(wait);
+//   }
+// }
 
 // Input a value 0 to 255 to get a color value.
 // The colors are a transition r - g - b - back to r.
@@ -487,7 +486,7 @@ void loop() {
 
   // check for water level
   waterLevel = digitalRead(hallPin);
-  if (waterLevel == 1) {          //waterLevel == 1
+  if (true) {          //waterLevel == 1
     digitalWrite(relayPin, LOW);  // literally fogger off
     Serial.println("Water no");
     digitalWrite(rsvr, HIGH);
@@ -499,7 +498,7 @@ void loop() {
   } else {
   
     digitalWrite(rsvr, LOW);
-    if (manualMode) {
+    if (false) {
       manualModeF();
     } else {
       //Serial.println("auto mode");
@@ -518,11 +517,14 @@ void loop() {
 
       if ((relayState == false) && (((currentMillis - previousMillis2) >= OffTime) || stateChange)) {
         relayState = HIGH;                   // Turn relay ON
+        Serial.println("FOGGER ON ");
         previousMillis2 = currentMillis;     // Remember the time
         digitalWrite(relayPin, relayState);  // Update the actual LED
         stateChange = false;                 // set stateChange to false
       } else if ((relayState == true) && (((currentMillis - previousMillis2) >= OnTime) && !stateChange)) {
         relayState = LOW;  // Turn relay OFF
+        Serial.println("FOGGER OFF ");
+
         previousMillis2 = currentMillis;
         digitalWrite(relayPin, relayState);
         stateChange = false;
